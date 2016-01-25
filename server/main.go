@@ -28,6 +28,7 @@ func main() {
 
 	//Setup our routes
 	router.Handle("/presets", &handlers.Presets{}).Methods("GET")
+	router.Handle("/select/{source}/{location}", &handlers.Select{}).Methods("GET")
 
 	//Listen for connections and serve content
 	logger.Info.Println(http.ListenAndServe(":"+strconv.Itoa(listenPort), logger.HttpLog(router)))
