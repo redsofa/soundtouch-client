@@ -24,7 +24,9 @@ func main() {
 			fmt.Println("Couldn't receive msg " + err.Error())
 			break
 		}
+		fmt.Println("----------------------------\n")
 		fmt.Println("Received from server: " + msg)
+		fmt.Println("----------------------------\n")
 	}
 	os.Exit(0)
 }
