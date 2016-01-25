@@ -26,9 +26,11 @@ func main() {
 	//Create router
 	router := mux.NewRouter()
 
+	router.Handle("/", &handlers.Root{}).Methods("GET")
+
 	//Setup our routes
-	router.Handle("/presets", &handlers.Presets{}).Methods("GET")
-	router.Handle("/select/{source}/{location}", &handlers.Select{}).Methods("GET")
+	router.Handle("/rest/presets", &handlers.Presets{}).Methods("GET")
+	router.Handle("/rest/select/{source}/{location}", &handlers.Select{}).Methods("GET")
 
 	//Listen for connections and serve content
 	logger.Info.Println(http.ListenAndServe(":"+strconv.Itoa(listenPort), logger.HttpLog(router)))
