@@ -11,17 +11,21 @@ import (
 	"strconv"
 )
 
+const (
+	VERSION = "0.0.1"
+)
+
 func main() {
 	//Setup the logger
 	logger.InitLogger(ioutil.Discard, os.Stdout, os.Stdout, os.Stderr)
 
-	//Read configuration information from server_config.json
+	//Read configuration information from config.json
 	config.ReadServerConf("./")
 
 	//The port our server listens on
 	listenPort := config.ServerConf.Port
 
-	logger.Info.Printf("Sever Starting - Listing on port %d - (Version - %s)", listenPort, "0.0.1")
+	logger.Info.Printf("Sever Starting - Listing on port %d - (Version - %s)", listenPort, VERSION)
 
 	//Create router
 	router := mux.NewRouter()
