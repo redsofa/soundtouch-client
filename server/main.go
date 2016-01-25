@@ -30,9 +30,8 @@ func main() {
 	//Create router
 	router := mux.NewRouter()
 
+	//Routes
 	router.Handle("/", &handlers.Root{}).Methods("GET")
-
-	//Setup our routes
 	router.Handle("/rest/presets", &handlers.Presets{}).Methods("GET")
 	router.Handle("/rest/select/{source}/{location}", &handlers.Select{}).Methods("GET")
 
