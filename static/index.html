@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <title>Bose SoundTouch Webservices Client</title>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>  
+  </head>
+
+  <body lang="en">
+
+	<table id="favorites">
+	  <tbody>
+	  </tbody>
+	</table>
+
+  </body>   
+  <script type="text/javascript">
+
+    function populateFavorites(data, div) {
+    	$.each( data.Presets, function( i, val ) {    		
+    		var location = val.ContentItem.Location
+  			var itemName = val.ContentItem.ItemName
+  			var source = val.ContentItem.Source
+
+			$("#favorites tbody").append('<tr><td><button id="' + location + '" type="button" class="btn btn-primary btn-block">' + itemName + '</button></td></tr>');
+
+  			$("#"+ location).bind( "click", function() {
+  				sw(source, location)
+			}); 
+		});
+    }
+
+    function sw(source, location){
+    	$.ajax({
+            url: '/rest/select/'+ source + '/' + location  ,
+            type: 'GET',
+            contentType:'application/json',
+        }); 
+    }
+
+    function getFavorites(){
+        $.ajax({
+            url: '/rest/presets',
+            type: 'GET',
+            contentType:'application/json',
+        }).success(function (data){	            
+            populateFavorites(data, $("#favorites"));
+        }); 
+    }
+
+	jQuery(document).ready(function($) {
+	    getFavorites();
+	});
+
+	</script>
+</html>

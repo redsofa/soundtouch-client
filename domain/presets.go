@@ -8,8 +8,9 @@ type Preset struct {
 type ContentItem struct {
 	Source   string `xml:"source,attr"`
 	Location string `xml:"location,attr"`
+	ItemName string `xml:"itemName"`
 }
 
 type Presets struct {
-	Pressets []Preset `xml:"preset"`
+	Presets []Preset `xml:"preset"`
 }

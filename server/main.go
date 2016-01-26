@@ -31,7 +31,7 @@ func main() {
 	router := mux.NewRouter()
 
 	//Routes
-	router.Handle("/", &handlers.Root{}).Methods("GET")
+	router.Handle("/", http.FileServer(http.Dir("../static")))
 	router.Handle("/rest/presets", &handlers.Presets{}).Methods("GET")
 	router.Handle("/rest/select/{source}/{location}", &handlers.Select{}).Methods("GET")
 
