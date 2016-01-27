@@ -13,15 +13,40 @@
 
   <body lang="en">
 
+  <table id="volume">
+    <tbody>
+      <tr>
+        <td><button id="volUp" type="button" class="btn btn-primary btn-block">+</button></td>
+        <td><button id="volDown" type="button" class="btn btn-primary btn-block">-</button></td> 
+        <td>&nbsp;</td> 
+        <td>Volume : </td> 
+        <td><div id="vol"><div></td> 
+      </tr> 
+    </tbody>
+  </table>
+
 	<table id="favorites">
 	  <tbody>
 	  </tbody>
 	</table>
 
+
+
+  <div id ="log">
+  </div>
+
   </body>   
   <script type="text/javascript">
 
     function populateFavorites(data, div) {
+      function sw(source, location){
+        $.ajax({
+              url: '/rest/select/'+ source + '/' + location  ,
+              type: 'GET',
+              contentType:'application/json',
+          }); 
+      }
+
     	$.each( data.Presets, function( i, val ) {    		
     		var location = val.ContentItem.Location
   			var itemName = val.ContentItem.ItemName
@@ -31,16 +56,8 @@
 
   			$("#"+ location).bind( "click", function() {
   				sw(source, location)
-			}); 
-		});
-    }
-
-    function sw(source, location){
-    	$.ajax({
-            url: '/rest/select/'+ source + '/' + location  ,
-            type: 'GET',
-            contentType:'application/json',
-        }); 
+			  }); 
+		  });
     }
 
     function getFavorites(){
@@ -53,9 +70,86 @@
         }); 
     }
 
-	jQuery(document).ready(function($) {
-	    getFavorites();
-	});
+    function getCurrentVolumeInfo(){
+        var d = $.Deferred();
+        $.ajax({
+                url: '/rest/volume',
+                type: 'GET',
+                contentType: 'application/json'
+        }).success(function(volInfo){
+            d.resolve(volInfo);
+        }).fail(function(request, status, error){        
+            d.reject(error);              
+        }); 
+        return d.promise();
+    }
+
+    function volUp(){
+      incrementVolume = function(volInfo) {
+          targetVolume = parseInt(volInfo.ActualVolume) + 1;
+          var d = $.Deferred();
+          $.ajax({
+                  url: '/rest/volume/'+ targetVolume,
+                  type: 'GET',
+                  contentType: 'application/json'
+          }).success(function(resp){
+              d.resolve(resp);
+          }).fail(function(request, status, error){
+            d.reject(error);
+          }); 
+          return d.promise();
+      }
+
+      getCurrentVolumeInfo()
+        .then(incrementVolume)
+        .then(function(targetVolume){
+          $("#vol").text(targetVolume.TargetVolume)
+        })
+        .fail(function(error) {
+          $('#log').append("<p>Error Incrementing Volume : " + error + "</p>");
+        });
+    }
+
+    function volDown(){
+      decrementVolume = function(volInfo) {
+          targetVolume = parseInt(volInfo.ActualVolume) - 1;
+          var d = $.Deferred();
+          $.ajax({
+                  url: '/rest/volume/'+ targetVolume,
+                  type: 'GET',
+                  contentType: 'application/json'
+          }).success(function(resp){
+              d.resolve(resp);
+          }).fail(function(request, status, error){
+            d.reject(error);
+          }); 
+          return d.promise();
+      }
+
+      getCurrentVolumeInfo()
+        .then(decrementVolume)
+        .then(function(targetVolume){
+          $("#vol").text(targetVolume.TargetVolume)
+        })
+        .fail(function(error) {
+          $('#log').append("<p>Error Decrementing Volume : " + error + "</p>");
+        });
+    }
+
+  	jQuery(document).ready(function($) {
+  	   getFavorites();
+       getCurrentVolumeInfo()
+        .then(function(targetVolume){
+            $("#vol").text(targetVolume.TargetVolume)
+        });
+
+       $("#volUp").bind( "click", function() {
+            volUp()
+       }); 
+       $("#volDown").bind( "click", function() {
+            volDown()
+       }); 
+  	});
 
 	</script>
 </html>

@@ -10,37 +10,28 @@ import (
 	"strings"
 )
 
-type Select struct {
+type SetVolume struct {
 }
 
-func (h *Select) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	logger.Info.Println("In Select Handler ... ")
+func (h *SetVolume) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	logger.Info.Println("In SetVolume Handler ... ")
 
 	vars := mux.Vars(r)
 
-	source, ok := vars["source"]
+	target, ok := vars["target"]
 	if !ok {
-		msg := "source variable not set"
+		msg := "SetVolume variable not set"
 		logger.Error.Println(msg)
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
 
-	location, ok := vars["location"]
-	if !ok {
-		msg := "location variable not set"
-		logger.Error.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
+	logger.Info.Println("Target : ", target)
 
-	logger.Info.Println("Source : ", source)
-	logger.Info.Println("Location : ", location)
-
-	_, err := h.makeSelection(source, location)
+	_, err := h.setVolume(target)
 
 	if err != nil {
-		msg := "Internal server error making select. Check Logs."
+		msg := "Internal server error changing volume. Check Logs."
 		logger.Error.Println(err)
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
@@ -49,13 +40,13 @@ func (h *Select) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	//Create response with our results...
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "{\"Status\":\"OK\"}")
+	fmt.Fprintf(w, "{\"Status\":\"OK\", \"TargetVolume\":%s}", target)
 }
 
-func (h *Select) makeSelection(source string, location string) (*string, error) {
-	url := config.ServerConf.SoundTouchUrl + "/select"
+func (h *SetVolume) setVolume(target string) (*string, error) {
+	url := config.ServerConf.SoundTouchUrl + "/volume"
 
-	xml := fmt.Sprintf("<ContentItem source=\"%s\" sourceAccount=\"\" location=\"%s\"><itemName></itemName></ContentItem>", source, location)
+	xml := fmt.Sprintf("<volume>%s</volume>", target)
 
 	req, err := http.NewRequest("POST", url, strings.NewReader(xml))
 	req.Header.Set("Content-Type", "text/xml")
@@ -74,5 +65,4 @@ func (h *Select) makeSelection(source string, location string) (*string, error) 
 	retVal := string(body)
 
 	return &retVal, nil
-
 }

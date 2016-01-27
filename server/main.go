@@ -34,6 +34,8 @@ func main() {
 	router.Handle("/", http.FileServer(http.Dir("../static")))
 	router.Handle("/rest/presets", &handlers.Presets{}).Methods("GET")
 	router.Handle("/rest/select/{source}/{location}", &handlers.Select{}).Methods("GET")
+	router.Handle("/rest/volume", &handlers.GetVolume{}).Methods("GET")
+	router.Handle("/rest/volume/{target}", &handlers.SetVolume{}).Methods("GET")
 
 	//Listen for connections and serve content
 	logger.Info.Println(http.ListenAndServe(":"+strconv.Itoa(listenPort), logger.HttpLog(router)))
